@@ -59,6 +59,7 @@ export const LICENSE_ALLOWLIST = [
   'BSD-3-Clause AND MIT',
   'BSD-3-Clause OR MIT',
   'BSD-3-Clause',
+  'BlueOak-1.0.0',
   '(BSD-3-Clause OR GPL-2.0)',
   'BSD-like',
   'CC0-1.0',
@@ -78,6 +79,7 @@ export const LICENSE_ALLOWLIST = [
   '(OFL-1.1 AND MIT)',
   'PSF',
   'Public Domain',
+  'Python-2.0',
   'Unlicense',
   'WTFPL OR ISC',
   'WTFPL',
@@ -98,4 +100,11 @@ export const LICENSE_OVERRIDES = {
 
   // TODO can be removed once we upgrade the use of walk dependency past or equal to v2.3.14
   'walk@2.3.9': ['MIT'],
+
+  // `license-checker` predates `BlueOak-1.0.0` and cannot classify it, so it reports these as
+  // `UNKNOWN` or `Custom: <url>`; the `license` field of each package declares `BlueOak-1.0.0`.
+  'tar@7.5.22': ['BlueOak-1.0.0'],
+  'chownr@3.0.0': ['BlueOak-1.0.0'],
+  'yallist@5.0.0': ['BlueOak-1.0.0'],
+  'minipass@7.1.3': ['BlueOak-1.0.0'],
 };

@@ -1,0 +1,2 @@
+security:
+- Bump `@hapi/content`, `brace-expansion`, `braces`, `cross-spawn`, `dompurify`, `form-data`, `handlebars`, `js-cookie`, `js-yaml`, `lodash`, `lodash-es`, `node-forge`, `picomatch`, `serialize-javascript`, `tar` and `ws` to versions without known advisories

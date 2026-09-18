@@ -134,7 +134,12 @@ it('notifies of changes and completes once all bundles have changed', async () =
   const [watcher] = (MockWatchPack.mock.instances as any) as Array<jest.Mocked<ActualWatchpack>>;
   expect(watcher.on).toHaveBeenCalledTimes(1);
   expect(watcher.on).toHaveBeenCalledWith('change', expect.any(Function));
-  const [, changeListener] = watcher.on.mock.calls[0];
+  // `watcher.on` is overloaded per event name; the mocked call tuple needs to be
+  // widened before the "change" listener can be invoked directly.
+  const [, changeListener] = (watcher.on.mock.calls[0] as unknown) as [
+    string,
+    (...args: any[]) => void
+  ];
 
   // foo and bar are changes without 1sec so they are batched
   changeListener(bundleEntryPath(FOO_BUNDLE), 'modified');

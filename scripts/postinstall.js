@@ -93,6 +93,15 @@ const run = async () => {
     })
   );
 
+  // serialize-javascript 7.x uses the Web Crypto API (globalThis.crypto) which is not
+  // available in webpack 4 worker contexts on Node 18. Patch it to use Node's crypto.
+  promises.push(
+    patchFile('node_modules/serialize-javascript/index.js', {
+      from: 'var bytes = crypto.getRandomValues(new Uint8Array(UID_LENGTH));',
+      to: "var bytes = require('crypto').randomBytes(UID_LENGTH);",
+    })
+  );
+
   await Promise.all(promises);
 };
 
