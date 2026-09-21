@@ -61,7 +61,7 @@ jobs:
       - name: Get source information from PR number
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.pr_number != '' }}
         id: get_pr_info
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const { data: result } = await github.rest.pulls.get({
@@ -79,13 +79,13 @@ jobs:
           echo "SOURCE_BRANCH=${{ steps.get_pr_info.outputs.head_ref }}" >> $GITHUB_ENV
 
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.SOURCE_REPO }}
           ref: '${{ env.SOURCE_BRANCH }}'
 
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           registry-url: 'https://registry.npmjs.org'
@@ -102,7 +102,7 @@ jobs:
         run: node scripts/build_opensearch_dashboards_platform_plugins --no-examples --workers 12
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: ${{ env.FTR_PATH }}
           repository: ${{ env.TEST_REPO }}
@@ -132,7 +132,7 @@ jobs:
 
       - name: Cache Cypress
         id: cache-cypress
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ~/.cache/Cypress
           key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
@@ -150,24 +150,24 @@ jobs:
           command: yarn cypress:run-without-security --browser ${{ env.CYPRESS_BROWSER }} --spec ${{ env.SPEC }}
 
       # Screenshots are only captured on failure, will change this once we do visual regression tests
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: ftr-cypress-screenshots
+          name: ftr-cypress-screenshots-ciGroup${{ matrix.group }}
           path: ${{ env.FTR_PATH }}/cypress/screenshots
           retention-days: 1
       
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ftr-cypress-videos
+          name: ftr-cypress-videos-ciGroup${{ matrix.group }}
           path: ${{ env.FTR_PATH }}/cypress/videos
           retention-days: 1
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ftr-cypress-results
+          name: ftr-cypress-results-ciGroup${{ matrix.group }}
           path: ${{ env.FTR_PATH }}/cypress/results
           retention-days: 1
 
