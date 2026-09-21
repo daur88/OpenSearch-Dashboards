@@ -3,8 +3,10 @@
 
 name: Build and test
 
-# trigger on every commit push and PR for all branches except feature branches and pushes for backport branches
+# trigger on every commit push and PR for all branches except feature branches and pushes for backport branches,
+# and allow running it by hand from the Actions tab
 on:
+  workflow_dispatch:
   push:
     branches: [ '**', '!feature/**', '!backport/**' ]
     paths-ignore:
