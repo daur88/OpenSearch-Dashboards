@@ -28,7 +28,10 @@
  * under the License.
  */
 
+jest.mock('axios');
+
 import { load } from 'cheerio';
+import axios from 'axios';
 
 import { httpServerMock } from '../http/http_server.mocks';
 import { uiSettingsServiceMock } from '../ui_settings/ui_settings_service.mock';
@@ -61,6 +64,8 @@ const INJECTED_METADATA = {
 };
 
 const { createOpenSearchDashboardsRequest, createRawRequest } = httpServerMock;
+
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('RenderingService', () => {
   let service: RenderingService;
@@ -165,9 +170,19 @@ describe('RenderingService', () => {
   });
 
   describe('isUrlValid()', () => {
+    // Reaching the network would make these depend on assets that can move or disappear.
+    beforeEach(() => {
+      mockedAxios.get.mockImplementation((url) => {
+        if (typeof url === 'string' && url.includes('notfound')) {
+          return Promise.reject(new Error('Not found'));
+        }
+        return Promise.resolve({ status: 200 });
+      });
+    });
+
     it('checks valid SVG URL', async () => {
       const result = await service.isUrlValid(
-        'https://opensearch.org/assets/brand/SVG/Mark/opensearch_mark_default.svg',
+        'https://opensearch.org/wp-content/uploads/2025/01/opensearch_mark_default.svg',
         'config'
       );
       expect(result).toEqual(true);
@@ -175,7 +190,7 @@ describe('RenderingService', () => {
 
     it('checks valid PNG URL', async () => {
       const result = await service.isUrlValid(
-        'https://opensearch.org/assets/brand/PNG/Mark/opensearch_mark_default.png',
+        'https://opensearch.org/wp-content/uploads/2025/01/opensearch_mark_default.png',
         'config'
       );
       expect(result).toEqual(true);

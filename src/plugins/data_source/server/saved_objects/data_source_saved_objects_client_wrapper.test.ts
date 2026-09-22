@@ -2,6 +2,13 @@
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
+// `endpoint` validation resolves the host through `dns-sync`, which shells out to a real
+// lookup. That makes the suite depend on working DNS for `test.com`; stub it so the
+// endpoint checks below exercise the wrapper rather than the network.
+jest.mock('dns-sync', () => ({
+  resolve: (hostname: string) => (hostname === 'test.com' ? '127.0.0.1' : null),
+}));
+
 import uuid from 'uuid';
 import {
   httpServerMock,

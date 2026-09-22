@@ -93,6 +93,9 @@ it('builds a generated plugin into a viable archive', async () => {
     {
       cwd: PLUGIN_DIR,
       all: true,
+      // The build output is snapshotted, so keep browserslist from writing its
+      // "caniuse-lite is outdated" notice into it once the bundled data ages.
+      env: { BROWSERSLIST_IGNORE_OLD_DATA: '1' },
     }
   );
 
@@ -181,6 +184,9 @@ it('builds a non-semver generated plugin into a viable archive', async () => {
     {
       cwd: PLUGIN_DIR,
       all: true,
+      // The build output is snapshotted, so keep browserslist from writing its
+      // "caniuse-lite is outdated" notice into it once the bundled data ages.
+      env: { BROWSERSLIST_IGNORE_OLD_DATA: '1' },
     }
   );
 

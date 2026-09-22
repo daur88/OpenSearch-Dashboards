@@ -11,7 +11,20 @@ describe('IndexPatternSelect', () => {
   let client: SavedObjectsClientContract;
   const bulkGetMock = jest.fn();
 
-  const nextTick = () => new Promise((res) => process.nextTick(res));
+  // `debouncedFetch` waits 300ms and then awaits two round trips, so sleeping for exactly
+  // the debounce interval races the assertion on a loaded machine. Retry instead.
+  const eventually = async (assertion: () => void, timeout = 3000) => {
+    const deadline = Date.now() + timeout;
+    for (;;) {
+      try {
+        assertion();
+        return;
+      } catch (error) {
+        if (Date.now() > deadline) throw error;
+        await new Promise((res) => setTimeout(res, 20));
+      }
+    }
+  };
 
   beforeEach(() => {
     client = {
@@ -49,8 +62,8 @@ describe('IndexPatternSelect', () => {
 
     bulkGetMock.mockResolvedValue({ savedObjects: [{ attributes: { title: 'test1' } }] });
     compInstance.debouncedFetch('');
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    await nextTick();
-    expect(bulkGetMock).toBeCalledWith([{ id: 'testDataSourceId', type: 'data-source' }]);
+    await eventually(() =>
+      expect(bulkGetMock).toBeCalledWith([{ id: 'testDataSourceId', type: 'data-source' }])
+    );
   });
 });
